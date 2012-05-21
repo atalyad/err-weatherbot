@@ -9,7 +9,10 @@ class WeatherBot(BotPlugin):
 
     @botcmd
     def weather(self, mess, args):
-        """ Shows weather info for given location. Example: !weather New-York,NY """
+        """ Shows weather info for given location.
+        Example: !weather San Francisco, CA
+        or !weather brussels
+        """
         if not args:
             return 'Am I supposed to guess the location?...'
         args = args.strip()
