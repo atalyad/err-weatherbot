@@ -1,0 +1,6 @@
+[Core]
+Name = WeatherBot
+Module = weatherBot
+
+[Documentation]
+Description = should I take my umbrella today ?
