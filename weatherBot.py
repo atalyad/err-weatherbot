@@ -1,9 +1,8 @@
-from botplugin import BotPlugin
+from errbot.botplugin import BotPlugin
+from errbot.jabberbot import botcmd
 from weather import get_weather_for_location
 
 __author__ = 'AP'
-
-from jabberbot import botcmd
 
 class WeatherBot(BotPlugin):
 
