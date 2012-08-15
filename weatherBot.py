@@ -1,6 +1,14 @@
-from errbot.botplugin import BotPlugin
-from errbot.jabberbot import botcmd
 from weather import get_weather_for_location
+
+# Backward compatibility
+from errbot.version import VERSION
+from errbot.utils import version2array
+if version2array(VERSION) >= [1,6,0]:
+    from errbot import botcmd, BotPlugin
+else:
+    from errbot.botplugin import BotPlugin
+    from errbot.jabberbot import botcmd
+
 
 __author__ = 'AP'
 
