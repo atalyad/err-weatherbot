@@ -1,9 +1,10 @@
 __author__ = 'AP'
 from urllib import quote
 import urllib2
+import json
 from xml.dom import minidom
 
-WEATHER_URL = 'http://www.google.com/ig/api?weather='
+WEATHER_URL = 'http://api.openweathermap.org/data/2.1/find/' # 'http://www.google.com/ig/api?weather='
 
 
 def get_weather_for_location(location):
@@ -11,41 +12,42 @@ def get_weather_for_location(location):
     try:
 
         try:
-            res = urllib2.urlopen(WEATHER_URL+ quote(location))
-            dom = minidom.parseString(unicode(res.readlines()[0],  errors='ignore'))
-        except :
+            #TODO: support config units: metric / imperial
+            res = urllib2.Request(WEATHER_URL + 'name?units=metric&q=' + location)
+            opener = urllib2.build_opener()
+            f = opener.open(res)
+            j = json.load(f)
+        except Exception, e :
+            print e
             return 'Could not read the weather data for your location... it has funky characters in it....'
 
-        if dom.getElementsByTagName('problem_cause'):
+        if 'message' in j and j['message'] == 'not found':
             return 'is that a real place?... can\'t find it... :( '
 
         ans = ''
-        for node in dom.getElementsByTagName('forecast_information'):
-             for n in node.getElementsByTagName('forecast_date'):
-                ans += 'Forecast date: %s, ' % n.getAttribute('data')
-             for n in node.getElementsByTagName('city'):
-                 ans += (' Taken at %s' % n.getAttribute('data'))
-             ans += '\n'
 
-        i = 0
-        for node in dom.getElementsByTagName('forecast_conditions'):
-            if not i:
-                ans += 'Today: '
-            else:
-                for n in node.getElementsByTagName('day_of_week'):
-                    ans += n.getAttribute('data') + ': '
-            for n in node.getElementsByTagName('condition'):
-                ans += n.getAttribute('data') + ' '
-            for n in node.getElementsByTagName('low'):
-                low = int(n.getAttribute('data'))
-                if low is not None:
-                    ans += str(round((low - 32) / (9.0/5.0))) #convert to celsius
-            for n in node.getElementsByTagName('high'):
-                high = int(n.getAttribute('data'))
-                if high is not None:
-                    ans += ' - %s' % str(round((high - 32) / (9.0/5.0))) + u'\u2103, ' #convert to celsius
-            i+= 1
+        if j and 'list' in j:
+            l = j['list']
+            if l and l.count:
+                data = l[0]
 
+                if data and 'name' in data:
+                    ans += data['name'] + ': '
+
+                if 'main' in data and 'temp' in data['main']:
+                    ans += 'Today: ' + unicode(round(data['main']['temp'])) + u'\u2103'
+                    if 'temp_min' in data['main'] and 'temp_max' in data['main']:
+                        ans += ' low: ' + unicode(round(data['main']['temp_min'])) + u'\u2103'
+                        ans += ' high: ' + unicode(round(data['main']['temp_max'])) + u'\u2103'
+
+                if 'weather' in data and data['weather'].count:
+                    if data['weather'][0]['main']:
+                        ans += ' ' + data['weather'][0]['main']
+                        if data['weather'][0]['description']:
+                            ans += ', ' + data['weather'][0]['description']
+
+                if data and 'url' in data:
+                    ans += '\n' + data['url']
 
         return ans.rstrip(' ,')
 
