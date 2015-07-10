@@ -1,6 +1,8 @@
 [Core]
 Name = WeatherBot
 Module = weatherBot
+[Python]
+Version = 3
 
 [Documentation]
 Description = should I take my umbrella today ?
