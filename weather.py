@@ -27,7 +27,7 @@ def perform_request(**kwargs):
     performs request with all supported parameters.
     skips unknown parameters.
     """
-    args = dict([SUPPORTED_PARAMETERS[key](val) for key, val in kwargs.iteritems() if key in SUPPORTED_PARAMETERS])
+    args = dict([SUPPORTED_PARAMETERS[key](val) for key, val in kwargs.items() if key in SUPPORTED_PARAMETERS])
     url = consts.WEATHER_URL + urlencode(args)
     logging.debug("performing request to: {}, original args: {}".format(url, str(kwargs)))
     res = request.urlopen(url)
